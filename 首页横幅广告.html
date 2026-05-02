@@ -1,0 +1,64 @@
+<!-- 横幅广告招租 - 仅内容部分 -->
+<div class="gradient-bg h-[100px] w-full flex items-center justify-center relative overflow-hidden">
+    <!-- 背景装饰 -->
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-2 left-4 w-8 h-8 bg-white/30 rounded-full pulse-animation"></div>
+        <div class="absolute bottom-2 right-4 w-12 h-12 bg-white/20 rounded-full"></div>
+    </div>
+
+    <!-- 透明链接层 - 覆盖整个区域，但联系方式除外 -->
+    <a href="https://niceiphone.com/ad/" target="_blank" class="absolute inset-0 z-10" title="点击查看更多广告位"></a>
+
+    <!-- 主要内容 -->
+    <div class="relative z-20 flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 max-w-7xl w-full">
+        <!-- 左侧图标 -->
+        <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-lg pulse-animation flex-shrink-0">
+            <i class="fa fa-bullhorn text-lg sm:text-xl md:text-2xl text-white"></i>
+        </div>
+
+        <!-- 中间文字 - 响应跳转 -->
+        <a href="https://niceiphone.com/ad/" target="_blank" class="flex-1 min-w-0 text-center sm:text-left text-white hover:opacity-80 transition-opacity">
+            <h1 class="text-base sm:text-lg md:text-xl font-bold mb-0.5 truncate">
+                <i class="fa fa-fire text-yellow-300 mr-1"></i>
+                此广告位火热招商中
+            </h1>
+            <p class="text-[10px] sm:text-xs md:text-sm opacity-90 truncate">
+                <i class="fa fa-star text-yellow-300 mr-1"></i>
+                黄金位置 · 海量曝光 · 精准投放 · 超值回报
+            </p>
+        </a>
+
+        <!-- 右侧联系方式 - 可点击但不会触发跳转 -->
+        <div class="hidden md:flex flex-col gap-0.5 text-white text-right flex-shrink-0 relative z-30">
+            <a href="tel:18988479960" class="flex items-center justify-end gap-1 text-sm hover:text-yellow-300 transition-colors">
+                <i class="fa fa-phone"></i>
+                <span>18988479960</span>
+            </a>
+            <a href="weixin://dl/profile/ShiSanGe2026" class="flex items-center justify-end gap-1 text-sm hover:text-yellow-300 transition-colors">
+                <i class="fa fa-weixin"></i>
+                <span>微ShiSanGe2026</span>
+            </a>
+            <div>🐧 350722326</div>
+        </div>
+
+        <!-- 立即联系按钮 - 移动端简化 -->
+        <a href="tel:18988479960" class="relative z-30 flex items-center justify-center bg-white text-indigo-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm hover:bg-gray-100 transition-all pulse-animation flex-shrink-0">
+            <i class="fa fa-phone mr-1 sm:mr-2"></i>
+            <span class="hidden sm:inline">立即联系</span>
+            <span class="sm:hidden">联系</span>
+        </a>
+    </div>
+</div>
+
+<style>
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+</style>
