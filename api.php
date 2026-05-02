@@ -61,6 +61,11 @@ switch ($action) {
         echo json_encode(deletePosition($pdo, $id));
         break;
         
+    case 'toggle_position_status':
+        $id = intval($_GET['id'] ?? 0);
+        echo json_encode(togglePositionStatus($pdo, $id));
+        break;
+        
     // ==================== 广告管理 ====================
     case 'get_ads':
         echo json_encode(getAds($pdo));
@@ -330,6 +335,17 @@ function deletePosition($pdo, $id) {
     return ['code' => 500, 'msg' => '删除失败'];
 }
 
+function togglePositionStatus($pdo, $id) {
+    $sql = "UPDATE ad_positions SET status = IF(status = 1, 0, 1) WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $result = $stmt->execute([':id' => $id]);
+    
+    if ($result) {
+        return ['code' => 200, 'msg' => '状态切换成功'];
+    }
+    return ['code' => 500, 'msg' => '状态切换失败'];
+}
+
 // ==================== 广告函数 ====================
 
 function getAds($pdo) {
@@ -448,7 +464,7 @@ function uploadAdImage($pdo) {
     $filepath = $uploadDir . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        $url = '/ad/ads/' . $filename;
+        $url = 'ads/' . $filename;
         return ['code' => 200, 'msg' => '上传成功', 'data' => ['url' => $url]];
     }
     

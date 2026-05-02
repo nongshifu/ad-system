@@ -1451,7 +1451,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
     function renderPositions() {
         const grid = document.getElementById('positions-grid');
         grid.innerHTML = positions.map(pos => {
-            const statusClass = pos.status == 1 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+            const statusClass = pos.status == 1 ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 cursor-pointer' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-pointer';
             const statusText = pos.status == 1 ? '✅ 启用' : '❌ 禁用';
 
             return `<div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md card-hover transition-all border border-gray-100 dark:border-gray-700">
@@ -1460,7 +1460,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
                         <h3 class="font-bold text-gray-800 dark:text-white">${pos.name}</h3>
                         <code class="text-xs text-indigo-600 dark:text-indigo-400 mt-1 block">${pos.code}</code>
                     </div>
-                    <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</span>
+                    <span onclick="togglePositionStatus(${pos.id})" class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}" title="点击切换状态">${statusText}</span>
                 </div>
                 ${pos.image_url ? `<div class="mb-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer group relative" onclick="previewImage('${pos.image_url}')">
                     <img src="${pos.image_url}" alt="${pos.name}" class="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105">
@@ -1593,6 +1593,17 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
             showToast('删除成功');
             loadPositions();
             loadStats();
+        } else {
+            showToast(data.msg, true);
+        }
+    }
+
+    async function togglePositionStatus(id) {
+        const res = await fetch(apiUrl + '?action=toggle_position_status&id=' + id);
+        const data = await res.json();
+        if (data.code === 200) {
+            showToast('状态切换成功');
+            loadPositions();
         } else {
             showToast(data.msg, true);
         }
