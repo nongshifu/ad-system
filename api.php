@@ -3,10 +3,13 @@
  * 广告管理API
  * 提供广告和位置的增删改查接口
  * 独立版本
+ * 
+ * 使用方式：
+ * 1. 直接访问：如 http://example.com/ad/api.php?action=get_ad&position=home_banner
+ * 2. 被引入：require_once __DIR__ . '/api.php'; 然后调用 getAdWidget() 等函数
  */
 
-session_start();
-
+// 加载配置文件（必须在判断之前加载，否则被引入时无法使用函数）
 $configFile = __DIR__ . '/config.php';
 if (file_exists($configFile)) {
     require_once $configFile;
@@ -14,16 +17,12 @@ if (file_exists($configFile)) {
     require_once __DIR__ . '/config_default.php';
 }
 
-// 广告位置code常量（与ad_positions表code字段对应）
-define('AD_POSITION_HOME_BANNER', 'home_banner');
-define('AD_POSITION_HOME_SIDEBAR', 'home_sidebar');
-define('AD_POSITION_ORDER_BANNER', 'order_banner');
-define('AD_POSITION_ORDER_SIDEBAR', 'order_sidebar');
-define('AD_POSITION_DETAIL_BANNER', 'detail_banner');
-define('AD_POSITION_USER_BANNER', 'user_banner');
-define('AD_POSITION_FLOAT_AD', 'float_ad');
-define('AD_POSITION_DIALOG_AD', 'dialog_ad');
-define('AD_POSITION_APP_BANNER', 'app_banner');
+// 如果是被引入（不是直接访问），只加载函数和类，不执行 API 逻辑
+if (__FILE__ !== $_SERVER['SCRIPT_FILENAME']) {
+    return;
+}
+
+session_start();
 
 header('Content-Type: application/json');
 

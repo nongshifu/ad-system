@@ -567,7 +567,7 @@ $siteName = defined('AD_SITE_NAME') ? AD_SITE_NAME : '广告管理后台';
                                     <pre class="bg-gray-800 dark:bg-gray-900 text-gray-100 p-4 rounded-lg text-sm overflow-x-auto"><code>&lt;?php
 require_once __DIR__ . '/api.php';
 
-$html = getAdWidget(AD_POSITION_ORDER_BANNER, [
+$html = getAdWidget('order_banner', [
     'width' => '100%',
     'height' => '100px',
     'class' => 'mb-4'
@@ -660,23 +660,6 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
 });
 &lt;/script&gt;</code></pre>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-5">
-                            <h3 class="font-bold text-purple-800 dark:text-purple-400 mb-2 flex items-center gap-2">
-                                <i class="fa fa-cube"></i> 可用位置常量
-                            </h3>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_HOME_BANNER</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_HOME_SIDEBAR</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_ORDER_BANNER</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_ORDER_SIDEBAR</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_DETAIL_BANNER</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_USER_BANNER</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_FLOAT_AD</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_DIALOG_AD</code>
-                                <code class="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded text-purple-800 dark:text-purple-300">AD_POSITION_APP_BANNER</code>
                             </div>
                         </div>
 
@@ -1042,6 +1025,45 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
     <!-- Toast -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg font-medium hidden z-50"></div>
 
+    <!-- 广告代码模态框 -->
+    <div id="adcode-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0" onclick="closeAdCodeModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md mx-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                <h3 class="text-base font-bold"><i class="fa fa-code mr-2"></i>广告代码</h3>
+                <button onclick="closeAdCodeModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">位置：<span id="adcode-position-name" class="font-medium text-gray-700 dark:text-gray-300"></span></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">标识符：<code id="adcode-position-code" class="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded"></code></p>
+                
+                <!-- PHP调用方式 -->
+                <div class="mb-4">
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">PHP 调用（推荐）</p>
+                    <div class="relative">
+                        <pre id="adcode-php" class="text-xs bg-gray-800 dark:bg-gray-900 text-green-400 p-3 rounded-lg overflow-x-auto max-h-32"><code></code></pre>
+                        <button onclick="copyAdCode('php')" class="absolute top-2 right-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
+                            <i class="fa fa-copy mr-1"></i>复制
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- HTML+JS调用方式 -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">HTML + JavaScript 调用</p>
+                    <div class="relative">
+                        <pre id="adcode-html" class="text-xs bg-gray-800 dark:bg-gray-900 text-green-400 p-3 rounded-lg overflow-x-auto max-h-32"><code></code></pre>
+                        <button onclick="copyAdCode('html')" class="absolute top-2 right-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
+                            <i class="fa fa-copy mr-1"></i>复制
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 图片预览模态框 -->
     <div id="image-preview-modal" class="fixed inset-0 z-[60] hidden">
         <div class="modal-backdrop absolute inset-0" onclick="closeImagePreview()"></div>
@@ -1304,10 +1326,88 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
         document.getElementById('image-preview-modal').classList.add('hidden');
     }
 
+    // 广告代码模态框
+    let currentAdCodePosition = null;
+
+    function showAdCodeModal(positionCode, positionName) {
+        currentAdCodePosition = positionCode;
+        document.getElementById('adcode-position-name').textContent = positionName;
+        document.getElementById('adcode-position-code').textContent = positionCode;
+
+        // PHP调用代码
+        const phpCode = `&lt;?php
+require_once '/path/to/ad/api.php';
+
+$html = getAdWidget('${positionCode}', [
+    'width' => '100%',
+    'height' => 'auto'
+]);
+
+if ($html) {
+    echo $html;
+}
+?>`;
+        document.getElementById('adcode-php').querySelector('code').innerHTML = phpCode;
+
+        // HTML+JS调用代码
+        const htmlCode = `&lt;!-- 广告容器 --&gt;
+&lt;div id="ad-${positionCode}"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+(async () =&gt; {
+    const res = await fetch('/ad/api.php?action=get_ad&position=${positionCode}');
+    const data = await res.json();
+    if (data.code === 200 && data.data) {
+        const ad = data.data;
+        const container = document.getElementById('ad-${positionCode}');
+        
+        // 记录展示
+        fetch('/ad/api.php?action=record_view&id=' + ad.id + '&amp;position=${positionCode}');
+        
+        if (ad.type === 1) {
+            container.innerHTML = \`&lt;div style="position:relative"&gt;&lt;a href="\${ad.link_url}" target="_blank"&gt;&lt;img src="\${ad.image_url}" alt="\${ad.title}" style="width:100%"&gt;&lt;/a&gt;&lt;/div&gt;\`;
+        } else if (ad.type === 2) {
+            container.innerHTML = \`&lt;div&gt;&lt;a href="\${ad.link_url}" target="_blank"&gt;\${ad.content}&lt;/a&gt;&lt;/div&gt;\`;
+        } else {
+            container.innerHTML = ad.content;
+        }
+    }
+})();
+&lt;/script&gt;`;
+        document.getElementById('adcode-html').querySelector('code').innerHTML = htmlCode;
+
+        document.getElementById('adcode-modal').classList.remove('hidden');
+    }
+
+    function closeAdCodeModal() {
+        document.getElementById('adcode-modal').classList.add('hidden');
+        currentAdCodePosition = null;
+    }
+
+    async function copyAdCode(type) {
+        const codeElement = document.getElementById('adcode-' + type).querySelector('code');
+        const code = codeElement.textContent;
+        
+        try {
+            await navigator.clipboard.writeText(code);
+            showToast('代码已复制到剪贴板');
+        } catch (err) {
+            // 降级方案
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('代码已复制到剪贴板');
+        }
+    }
+
     // 按ESC键关闭图片预览
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeImagePreview();
+            closeAdCodeModal();
         }
     });
 
@@ -1432,6 +1532,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
                     <span><i class="fa fa-star mr-1"></i> 优先级 ${pos.priority}</span>
                 </div>
                 <div class="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-gray-700">
+                    <button onclick="showAdCodeModal('${pos.code}', '${pos.name}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">代码</button>
                     <button onclick="editPosition(${pos.id})" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">编辑</button>
                     <button onclick="deletePosition(${pos.id})" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium">删除</button>
                 </div>
@@ -1647,6 +1748,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
                     <button onclick="toggleRelationStatus(${rel.id})" class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</button>
                 </td>
                 <td class="px-4 py-3">
+                    <button onclick="showAdCodeModal('${rel.position_code}', '${rel.position_name}')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm mr-3">代码</button>
                     <button onclick="editRelation(${rel.id})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium text-sm mr-3">编辑</button>
                     <button onclick="deleteRelation(${rel.id})" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium text-sm">删除</button>
                 </td>
