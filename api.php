@@ -239,7 +239,17 @@ switch ($action) {
 // ==================== 广告位置函数 ====================
 
 function getPositions($pdo) {
-    $sql = "SELECT * FROM ad_positions ORDER BY priority DESC, id ASC";
+    $sql = "SELECT ap.*, 
+                   COALESCE(ad_count.active_ad_count, 0) as ad_count
+            FROM ad_positions ap
+            LEFT JOIN (
+                SELECT apr.position_id, COUNT(*) as active_ad_count
+                FROM ad_position_relations apr
+                INNER JOIN ads a ON apr.ad_id = a.id
+                WHERE apr.status = 1 AND a.status = 1
+                GROUP BY apr.position_id
+            ) ad_count ON ap.id = ad_count.position_id
+            ORDER BY ap.priority DESC, ap.id ASC";
     $stmt = $pdo->query($sql);
     $positions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return ['code' => 200, 'msg' => 'success', 'data' => $positions];

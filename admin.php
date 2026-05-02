@@ -1065,13 +1065,16 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
     </div>
 
     <!-- 图片预览模态框 -->
-    <div id="image-preview-modal" class="fixed inset-0 z-[60] hidden">
-        <div class="modal-backdrop absolute inset-0" onclick="closeImagePreview()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[90vh]">
-            <button onclick="closeImagePreview()" class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors text-white text-xl">
+    <div id="ad-preview-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="modal-backdrop absolute inset-0" onclick="closeAdPreview()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[85vh] w-full mx-4">
+            <button onclick="closeAdPreview()" class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors text-white text-xl z-10">
                 <i class="fa fa-times"></i>
             </button>
-            <img id="preview-image-src" src="" alt="预览" class="max-w-[90vw] max-h-[85vh] rounded-xl shadow-2xl">
+            <div id="preview-image-container" class="bg-white rounded-xl shadow-2xl p-4 max-h-[85vh] overflow-auto">
+                <img id="preview-image-src" src="" alt="预览" class="max-w-full max-h-[80vh] rounded-lg">
+                <div id="preview-html-content" class="min-h-[200px]"></div>
+            </div>
         </div>
     </div>
 
@@ -1182,7 +1185,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
                     <span class="inline-flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">${typeMap[ad.type]?.icon} ${typeMap[ad.type]?.text}</span>
                 </td>
                 <td class="px-4 py-3">
-                    ${ad.image_url ? `<img src="${ad.image_url}" class="h-10 w-16 object-cover rounded cursor-pointer hover:ring-2 hover:ring-indigo-500" onclick="previewImage('${ad.image_url}')">` : '<span class="text-gray-400 dark:text-gray-500 text-sm">无预览</span>'}
+                    ${ad.type == 3 && ad.content ? `<button onclick="previewAdById(${ad.id})" class="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-xs hover:bg-indigo-200 dark:hover:bg-indigo-800/30 transition-colors">预览HTML</button>` : ad.image_url ? `<img src="${ad.image_url}" class="h-10 w-16 object-cover rounded cursor-pointer hover:ring-2 hover:ring-indigo-500" onclick="previewAdById(${ad.id})">` : '<span class="text-gray-400 dark:text-gray-500 text-sm">无预览</span>'}
                 </td>
                 <td class="px-4 py-3">
                     <label class="switch" title="${statusText[ad.status]}">
@@ -1230,7 +1233,7 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
                     <span class="inline-flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">${typeMap[ad.type]?.icon} ${typeMap[ad.type]?.text}</span>
                 </td>
                 <td class="px-4 py-3">
-                    ${ad.image_url ? `<img src="${ad.image_url}" class="h-10 w-16 object-cover rounded cursor-pointer hover:ring-2 hover:ring-indigo-500" onclick="previewImage('${ad.image_url}')">` : '<span class="text-gray-400 dark:text-gray-500 text-sm">无预览</span>'}
+                    ${ad.type == 3 && ad.content ? `<button onclick="previewAdById(${ad.id})" class="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-xs hover:bg-indigo-200 dark:hover:bg-indigo-800/30 transition-colors">预览HTML</button>` : ad.image_url ? `<img src="${ad.image_url}" class="h-10 w-16 object-cover rounded cursor-pointer hover:ring-2 hover:ring-indigo-500" onclick="previewAdById(${ad.id})">` : '<span class="text-gray-400 dark:text-gray-500 text-sm">无预览</span>'}
                 </td>
                 <td class="px-4 py-3">
                     <label class="switch" title="${statusText[ad.status]}">
@@ -1315,15 +1318,46 @@ adLoader.load('ad-sidebar', 'home_sidebar', {
         }
     }
 
-    function previewImage(url) {
-        const modal = document.getElementById('image-preview-modal');
+    function previewAdById(adId) {
+        // 从全局ads数组中查找广告
+        const ad = ads.find(a => a.id == adId);
+        if (!ad) {
+            showToast('广告不存在', true);
+            return;
+        }
+        
+        const modal = document.getElementById('ad-preview-modal');
+        const imgContainer = document.getElementById('preview-image-container');
         const img = document.getElementById('preview-image-src');
-        img.src = url;
+        const htmlContent = document.getElementById('preview-html-content');
+        
+        // 隐藏所有内容
+        img.classList.add('hidden');
+        htmlContent.classList.add('hidden');
+        
+        // 根据广告类型显示不同内容
+        if (ad.type == 3 && ad.content) {
+            // HTML广告 - 渲染HTML内容
+            htmlContent.innerHTML = ad.content;
+            htmlContent.classList.remove('hidden');
+            imgContainer.style.backgroundColor = '#f9fafb';
+        } else if (ad.image_url) {
+            // 图片广告 - 显示图片
+            img.src = ad.image_url;
+            img.classList.remove('hidden');
+            imgContainer.style.backgroundColor = 'white';
+        } else {
+            // 文字广告或无预览内容
+            htmlContent.innerHTML = `<div class="text-center py-10 text-gray-500"><i class="fa fa-info-circle text-4xl mb-3"></i><p>暂无预览内容</p></div>`;
+            htmlContent.classList.remove('hidden');
+            imgContainer.style.backgroundColor = '#f9fafb';
+        }
+        
         modal.classList.remove('hidden');
     }
 
-    function closeImagePreview() {
-        document.getElementById('image-preview-modal').classList.add('hidden');
+    function closeAdPreview() {
+        document.getElementById('ad-preview-modal').classList.add('hidden');
     }
 
     // 广告代码模态框
@@ -1529,6 +1563,7 @@ if ($html) {
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">${pos.description || '无描述'}</p>
                 <div class="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
                     <span><i class="fa fa-expand mr-1"></i> ${pos.width || 0} × ${pos.height || 0}</span>
+                    <span><i class="fa fa-bullhorn mr-1"></i> ${pos.ad_count || 0} 个广告</span>
                     <span><i class="fa fa-star mr-1"></i> 优先级 ${pos.priority}</span>
                 </div>
                 <div class="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-gray-700">
@@ -1574,6 +1609,7 @@ if ($html) {
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">${pos.description || '无描述'}</p>
                 <div class="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
                     <span><i class="fa fa-expand mr-1"></i> ${pos.width || 0} × ${pos.height || 0}</span>
+                    <span><i class="fa fa-bullhorn mr-1"></i> ${pos.ad_count || 0} 个广告</span>
                     <span><i class="fa fa-star mr-1"></i> 优先级 ${pos.priority}</span>
                 </div>
                 <div class="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-gray-700">

@@ -124,14 +124,6 @@ require_once __DIR__ . '/config.php';
                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">高度</label>
                     <input type="number" id="search-height" placeholder="高度" class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
                 </div>
-                <div class="w-28">
-                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">状态</label>
-                    <select id="search-status" class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
-                        <option value="">全部</option>
-                        <option value="1">已启用</option>
-                        <option value="0">已禁用</option>
-                    </select>
-                </div>
                 <div class="w-32">
                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">排序</label>
                     <select id="search-order" class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
@@ -251,14 +243,12 @@ require_once __DIR__ . '/config.php';
             const keyword = document.getElementById('search-keyword').value.toLowerCase();
             const width = document.getElementById('search-width').value;
             const height = document.getElementById('search-height').value;
-            const status = document.getElementById('search-status').value;
             const order = document.getElementById('search-order').value;
 
             let filtered = allPositions.filter(pos => {
                 if (keyword && !pos.name.toLowerCase().includes(keyword) && !pos.code.toLowerCase().includes(keyword) && !(pos.description || '').toLowerCase().includes(keyword)) return false;
                 if (width && String(pos.width) !== width) return false;
                 if (height && String(pos.height) !== height) return false;
-                if (status && String(pos.status) !== status) return false;
                 return true;
             });
 
@@ -286,11 +276,6 @@ require_once __DIR__ . '/config.php';
             }
 
             grid.innerHTML = positions.map(pos => {
-                const statusClass = pos.status == 1 
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
-                const statusText = pos.status == 1 ? '✅ 启用' : '❌ 禁用';
-
                 const imageHtml = pos.image_url 
                     ? `<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 mb-4 cursor-pointer group relative" onclick="previewImage('${pos.image_url}')">
                             <img src="${pos.image_url}" alt="${pos.name}" class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105">
@@ -306,12 +291,11 @@ require_once __DIR__ . '/config.php';
 
                 return `
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md card-hover border border-gray-100 dark:border-gray-700 transition-all duration-300">
-                        <div class="flex justify-between items-start mb-3">
+                        <div class="mb-3">
                             <div>
                                 <h3 class="font-bold text-gray-800 dark:text-white text-lg">${pos.name}</h3>
                                 <code class="text-xs text-indigo-600 dark:text-indigo-400 mt-1 block">${pos.code}</code>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</span>
                         </div>
                         
                         ${imageHtml}
@@ -320,6 +304,7 @@ require_once __DIR__ . '/config.php';
                         
                         <div class="flex justify-between items-center text-sm text-gray-400 dark:text-gray-500 border-t dark:border-gray-700 pt-4">
                             <span><i class="fa fa-expand mr-1"></i> ${pos.width || 0} × ${pos.height || 0}</span>
+                            <span><i class="fa fa-bullhorn mr-1"></i> ${pos.ad_count || 0} 个广告</span>
                             <span><i class="fa fa-star mr-1"></i> 优先级 ${pos.priority || 0}</span>
                         </div>
                     </div>
@@ -340,7 +325,6 @@ require_once __DIR__ . '/config.php';
             document.getElementById('search-keyword').value = '';
             document.getElementById('search-width').value = '';
             document.getElementById('search-height').value = '';
-            document.getElementById('search-status').value = '';
             document.getElementById('search-order').value = 'priority-desc';
             filterAndRender();
         }
@@ -352,7 +336,6 @@ require_once __DIR__ . '/config.php';
         document.getElementById('search-keyword').addEventListener('input', filterAndRender);
         document.getElementById('search-width').addEventListener('input', filterAndRender);
         document.getElementById('search-height').addEventListener('input', filterAndRender);
-        document.getElementById('search-status').addEventListener('change', filterAndRender);
         document.getElementById('search-order').addEventListener('change', filterAndRender);
 
         loadPositions();
